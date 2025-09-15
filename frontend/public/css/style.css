@@ -1,0 +1,112 @@
+:root {
+  --primary: #eb4d4b;
+  --bg: #f8f9fa;
+  --text: #333;
+  --white: #fff;
+  --shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height:1.6; }
+
+/* --- Header --- */
+header {
+  background: var(--primary);
+  color: var(--white);
+  text-align: center;
+  padding: 80px 20px;
+}
+header h1 { font-size: 2.4rem; margin-bottom: 15px; }
+header p { font-size: 1.2rem; margin-bottom: 20px; }
+.btn-cta {
+  display: inline-block;
+  background: var(--white);
+  color: var(--primary);
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+}
+.btn-cta:hover { background: #ffecec; }
+
+/* --- Sections --- */
+section {
+  padding: 60px 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--primary);
+}
+section p { margin-bottom: 15px; text-align: center; }
+
+/* --- About --- */
+#about img {
+  display: block;
+  max-width: 220px;
+  border-radius: 50%;
+  margin: 20px auto;
+  box-shadow: var(--shadow);
+}
+
+/* --- Media --- */
+#media .video-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+#media video {
+  width: 100%;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+@media(max-width: 768px) {
+  #media .video-container { grid-template-columns: 1fr; }
+}
+
+/* --- Testimonials --- */
+.testimonial {
+  background: var(--white);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+.testimonial p { font-style: italic; margin-bottom: 10px; }
+
+/* --- Forms --- */
+form {
+  display: grid;
+  gap: 15px;
+  max-width: 600px;
+  margin: 20px auto;
+}
+input, textarea, button {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+textarea { resize: vertical; min-height: 120px; }
+button {
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover { background: #c9403e; }
+
+/* --- Footer --- */
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #eee;
+  font-size: 0.9rem;
+}

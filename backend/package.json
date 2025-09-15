@@ -1,0 +1,17 @@
+{
+  "name": "concerts-ehpad-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "dotenv": "^17.2.2",
+    "nodemailer": "^7.0.6"
+  }
+}
