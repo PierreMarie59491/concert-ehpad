@@ -1,5 +1,5 @@
 // URL du backend Render
-const API_BASE = "https://concert-ehpad-1.onrender.com";
+const API_BASE = "https://concert-ehpad-2.onrender.com";
 
 // Charger les avis
 async function loadTestimonials() {
