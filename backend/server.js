@@ -20,7 +20,7 @@ app.use(helmet());
 
 // ⚡ CORS : autoriser uniquement ton frontend Vercel
 app.use(cors({
-  origin: "https://concert-ehpad-wwfp-bmq8jq5uc-pierremars-projects.vercel.app",
+  origin: "https://concert-ehpad-wwfp-m2n4n0cvq-pierremars-projects.vercel.app", // <--- URL exacte
   methods: ["GET", "POST"]
 }));
 
