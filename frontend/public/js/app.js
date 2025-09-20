@@ -1,52 +1,56 @@
-const API = window.API_BASE;
+// URL du backend Render
+const API_BASE = "https://concert-ehpad-1.onrender.com";
 
 // Charger les avis
 async function loadTestimonials() {
   try {
-    const res = await fetch(`${API}/api/testimonials`);
-    const data = await res.json();
-    const container = document.getElementById('testimonial-list');
-    container.innerHTML = data.map(t => `
-      <div class="testimonial">
-        <p>"${escapeHtml(t.message)}"</p>
-        <small>${escapeHtml(t.structure)} - ${escapeHtml(t.date)}</small>
-      </div>`).join('');
+    const res = await fetch(`${API_BASE}/testimonials`);
+    if (!res.ok) throw new Error("Erreur de chargement des avis");
+    const testimonials = await res.json();
+
+    const list = document.getElementById("testimonial-list");
+    list.innerHTML = "";
+
+    testimonials.forEach(t => {
+      const div = document.createElement("div");
+      div.classList.add("testimonial");
+      div.innerHTML = `
+        <p>"${t.message}"</p>
+        <p><strong>${t.structure}</strong> – ${t.date}</p>
+      `;
+      list.appendChild(div);
+    });
   } catch (err) {
     console.error(err);
   }
 }
 
-// Publier un nouvel avis
-document.getElementById('testimonial-form').addEventListener('submit', async e => {
+// Ajouter un avis
+document.getElementById("testimonial-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const fd = new FormData(e.target);
-  const body = Object.fromEntries(fd);
-  const res = await fetch(`${API}/api/testimonials`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  if (res.ok) { e.target.reset(); loadTestimonials(); }
-  else alert('Erreur lors de l\'ajout de l\'avis');
+
+  const form = e.target;
+  const data = {
+    structure: form.structure.value,
+    message: form.message.value,
+    date: form.date.value,
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/testimonials`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) throw new Error("Erreur lors de l'envoi de l'avis");
+
+    form.reset();
+    loadTestimonials();
+  } catch (err) {
+    console.error(err);
+  }
 });
 
-// Envoyer le formulaire contact
-document.getElementById('contact-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  const body = Object.fromEntries(fd);
-  const res = await fetch(`${API}/api/contact`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  if (res.ok) { alert('Message envoyé !'); e.target.reset(); }
-  else alert('Erreur lors de l\'envoi du message');
-});
-
-// Sécuriser le contenu affiché
-function escapeHtml(str = '') {
-  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-}
-
-document.addEventListener('DOMContentLoaded', loadTestimonials);
+// Charger au démarrage
+window.addEventListener("DOMContentLoaded", loadTestimonials);
