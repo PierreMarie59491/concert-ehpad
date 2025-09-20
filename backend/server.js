@@ -28,10 +28,10 @@ app.use(cors({
 app.use(express.static(path.join(__dirname, "public")));
 
 // --- ROUTES ---
-// Landing page (optionnel si Vercel sert le frontend)
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+// // Landing page (optionnel si Vercel sert le frontend)
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, "public", "index.html"));
+// });
 
 // Get testimonials
 app.get("/testimonials", (req, res) => {
