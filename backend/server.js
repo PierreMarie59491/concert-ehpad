@@ -1,3 +1,4 @@
+// concerts-ehpad-backend/server.js
 import express from "express";
 import fs from "fs";
 import path from "path";
@@ -5,7 +6,6 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
-import morgan from "morgan";
 
 dotenv.config();
 
@@ -13,80 +13,80 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const __dirname = path.resolve();
 
-// Middlewares
+// --- Middlewares ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
-app.use(morgan("tiny"));
 
-// CORS : seulement ton frontend Vercel
-const allowedOrigin = process.env.ALLOWED_ORIGIN || "*";
-app.use(cors({ origin: allowedOrigin }));
+// ⚡ CORS : autoriser uniquement ton frontend Vercel
+app.use(cors({
+  origin: "https://concert-ehpad-wwfp-bmq8jq5uc-pierremars-projects.vercel.app",
+  methods: ["GET", "POST"]
+}));
 
-const DATA_FILE = path.join(__dirname, "data", "testimonials.json");
+// ⚡ Static files (si jamais tu as un frontend léger côté backend)
+app.use(express.static(path.join(__dirname, "public")));
 
-// ------------------
-// API — Testimonials
-// ------------------
-app.get("/api/testimonials", (req, res) => {
-  try {
-    const testimonials = JSON.parse(fs.readFileSync(DATA_FILE, "utf8") || "[]");
-    res.json(testimonials);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Impossible de lire les avis" });
-  }
+// --- ROUTES ---
+// Landing page (optionnel si Vercel sert le frontend)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.post("/api/testimonials", (req, res) => {
+// Get testimonials
+app.get("/testimonials", (req, res) => {
+  const filePath = path.join(__dirname, "data", "testimonials.json");
+  const testimonials = JSON.parse(fs.readFileSync(filePath));
+  res.json(testimonials);
+});
+
+// Post new testimonial
+app.post("/testimonials", (req, res) => {
   const { structure, message, date } = req.body;
-  if (!structure || !message || !date) return res.status(400).json({ error: "Champs manquants" });
-
-  try {
-    const testimonials = JSON.parse(fs.readFileSync(DATA_FILE, "utf8") || "[]");
-    testimonials.unshift({ structure, message, date }); // dernier en premier
-    fs.writeFileSync(DATA_FILE, JSON.stringify(testimonials, null, 2));
-    res.json({ success: true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur en sauvegarde" });
+  if (!structure || !message || !date) {
+    return res.status(400).json({ error: "Champs manquants" });
   }
+
+  const filePath = path.join(__dirname, "data", "testimonials.json");
+  const testimonials = JSON.parse(fs.readFileSync(filePath));
+  testimonials.push({ structure, message, date });
+  fs.writeFileSync(filePath, JSON.stringify(testimonials, null, 2));
+
+  res.json({ success: true });
 });
 
-// ------------------
-// API — Contact
-// ------------------
-app.post("/api/contact", async (req, res) => {
+// Contact form via Nodemailer
+app.post("/contact", async (req, res) => {
   const { name, email, phone, message } = req.body;
-  if (!name || !email || !message) return res.status(400).json({ error: "Champs manquants" });
+
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: "Champs obligatoires manquants" });
+  }
 
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || 587),
-      secure: process.env.SMTP_SECURE === "true",
+      service: "gmail", // ou ton SMTP pro
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
     });
 
     await transporter.sendMail({
-      from: `${name} <${email}>`,
-      to: process.env.CONTACT_EMAIL,
-      subject: `Nouveau message site - ${name}`,
-      text: `Nom: ${name}\nEmail: ${email}\nTéléphone: ${phone || "N/A"}\n\nMessage:\n${message}`
+      from: email,
+      to: process.env.EMAIL_USER,
+      subject: "Nouveau message via site concerts Ehpad",
+      text: `Nom: ${name}\nEmail: ${email}\nTéléphone: ${phone || "N/A"}\n\nMessage:\n${message}`,
     });
 
     res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erreur lors de l'envoi du mail" });
+    res.status(500).json({ error: "Erreur d’envoi" });
   }
 });
 
-// Health check (optionnel)
-app.get("/healthz", (req, res) => res.send("ok"));
-
-// Lancer le serveur
-app.listen(PORT, () => console.log(`🚀 Backend lancé sur le port ${PORT}`));
+// --- Lancer le serveur ---
+app.listen(PORT, () => {
+  console.log(`🚀 Backend lancé sur http://localhost:${PORT}`);
+});
